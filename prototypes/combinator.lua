@@ -6,33 +6,33 @@
 
 local flib = require('__flib__.data-util')
 
-local provider_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "ltn-provider-reader")
+local provider_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "cybersyn-provider-reader")
 provider_reader_entity.item_slot_count = 50 -- will be overwritten in final-fixes
-provider_reader_entity.icon = "__LTN_Content_Reader__/graphics/icons/ltn-provider-reader.png"
+provider_reader_entity.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-provider-reader.png"
 provider_reader_entity.icon_size = 64
 provider_reader_entity.icon_mipmaps = 4
 
-local provider_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "ltn-provider-reader")
-provider_reader_item.icon = "__LTN_Content_Reader__/graphics/icons/ltn-provider-reader.png"
+local provider_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "cybersyn-provider-reader")
+provider_reader_item.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-provider-reader.png"
 provider_reader_item.icon_size = 64
 provider_reader_item.icon_mipmaps = 4
 provider_reader_item.subgroup = "circuit-network-2"
-provider_reader_item.order = "ltnr-a"
+provider_reader_item.order = "cybersynr-a"
 -- provider_reader_item.order = provider_reader_item.order.."b" -- sort after constant_combinator
 
-local provider_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "ltn-provider-reader")
+local provider_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "cybersyn-provider-reader")
 
 
-local requester_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "ltn-requester-reader")
+local requester_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "cybersyn-requester-reader")
 requester_reader_entity.item_slot_count = 50 -- will be overwritten in final-fixes
-requester_reader_entity.icon = "__LTN_Content_Reader__/graphics/icons/ltn-requester-reader.png"
+requester_reader_entity.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-requester-reader.png"
 requester_reader_entity.icon_size = 64
 requester_reader_entity.icon_mipmaps = 4
 requester_reader_entity.sprites = make_4way_animation_from_spritesheet(
   { layers =
     {
       {
-        filename = "__LTN_Content_Reader__/graphics/entity/ltn-requester-reader.png",
+        filename = "__Cybersyn-Content-Reader__/graphics/entity/cybersyn-requester-reader.png",
         width = 58,
         height = 52,
         frame_count = 1,
@@ -40,7 +40,7 @@ requester_reader_entity.sprites = make_4way_animation_from_spritesheet(
         hr_version =
         {
           scale = 0.5,
-          filename = "__LTN_Content_Reader__/graphics/entity/hr-ltn-requester-reader.png",
+          filename = "__Cybersyn-Content-Reader__/graphics/entity/hr-cybersyn-requester-reader.png",
           width = 114,
           height = 102,
           frame_count = 1,
@@ -69,27 +69,27 @@ requester_reader_entity.sprites = make_4way_animation_from_spritesheet(
   })
 
 
-local requester_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "ltn-requester-reader")
-requester_reader_item.icon = "__LTN_Content_Reader__/graphics/icons/ltn-requester-reader.png"
+local requester_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "cybersyn-requester-reader")
+requester_reader_item.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-requester-reader.png"
 requester_reader_item.icon_size = 64
 requester_reader_item.icon_mipmaps = 4
 requester_reader_item.subgroup = "circuit-network-2"
-requester_reader_item.order = "ltnr-b"
+requester_reader_item.order = "cybersynr-b"
 -- requester_reader_item.order = requester_reader_item.order.."c" -- sort after constant_combinator
 
-local requester_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "ltn-requester-reader")
+local requester_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "cybersyn-requester-reader")
 
 
-local delivery_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "ltn-delivery-reader")
+local delivery_reader_entity = flib.copy_prototype(data.raw["constant-combinator"]["constant-combinator"], "cybersyn-delivery-reader")
 delivery_reader_entity.item_slot_count = 50 -- will be overwritten in final-fixes
-delivery_reader_entity.icon = "__LTN_Content_Reader__/graphics/icons/ltn-delivery-reader.png"
+delivery_reader_entity.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-delivery-reader.png"
 delivery_reader_entity.icon_size = 64
 delivery_reader_entity.icon_mipmaps = 4
 delivery_reader_entity.sprites = make_4way_animation_from_spritesheet(
   { layers =
     {
       {
-        filename = "__LTN_Content_Reader__/graphics/entity/ltn-delivery-reader.png",
+        filename = "__Cybersyn-Content-Reader__/graphics/entity/cybersyn-delivery-reader.png",
         width = 58,
         height = 52,
         frame_count = 1,
@@ -97,7 +97,7 @@ delivery_reader_entity.sprites = make_4way_animation_from_spritesheet(
         hr_version =
         {
           scale = 0.5,
-          filename = "__LTN_Content_Reader__/graphics/entity/hr-ltn-delivery-reader.png",
+          filename = "__Cybersyn-Content-Reader__/graphics/entity/hr-cybersyn-delivery-reader.png",
           width = 114,
           height = 102,
           frame_count = 1,
@@ -125,15 +125,15 @@ delivery_reader_entity.sprites = make_4way_animation_from_spritesheet(
     },
   })
 
-local delivery_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "ltn-delivery-reader")
-delivery_reader_item.icon = "__LTN_Content_Reader__/graphics/icons/ltn-delivery-reader.png"
+local delivery_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "cybersyn-delivery-reader")
+delivery_reader_item.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-delivery-reader.png"
 delivery_reader_item.icon_size = 64
 delivery_reader_item.icon_mipmaps = 4
 delivery_reader_item.subgroup = "circuit-network-2"
-delivery_reader_item.order = "ltnr-c"
+delivery_reader_item.order = "cybersynr-c"
 -- delivery_reader_item.order = requester_reader_item.order.."d" -- sort after constant_combinator
 
-local delivery_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "ltn-delivery-reader")
+local delivery_reader_recipe = flib.copy_prototype(data.raw["recipe"]["constant-combinator"], "cybersyn-delivery-reader")
 
 data:extend({
   {
@@ -155,9 +155,9 @@ data:extend({
 
 -- add to circuit-network-2 if exists otherwise create tech
 if data.raw["technology"]["circuit-network-2"] then
-  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "ltn-provider-reader" } )
-  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "ltn-requester-reader" } )
-  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "ltn-delivery-reader" } )
+  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "cybersyn-provider-reader" } )
+  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "cybersyn-requester-reader" } )
+  table.insert( data.raw["technology"]["circuit-network-2"].effects, { type = "unlock-recipe", recipe = "cybersyn-delivery-reader" } )
 else
   data:extend({
     {
@@ -168,9 +168,9 @@ else
       prerequisites = {"circuit-network"},
       effects =
       {
-        { type = "unlock-recipe", recipe = "ltn-provider-reader" },
-        { type = "unlock-recipe", recipe = "ltn-requester-reader" },
-        { type = "unlock-recipe", recipe = "ltn-delivery-reader" },
+        { type = "unlock-recipe", recipe = "cybersyn-provider-reader" },
+        { type = "unlock-recipe", recipe = "cybersyn-requester-reader" },
+        { type = "unlock-recipe", recipe = "cybersyn-delivery-reader" },
       },
       unit =
       {
