@@ -4,31 +4,9 @@
  * See LICENSE.md in the project directory for license information.
 --]]
 
-require('api')
-
--- localize often used functions and strings
-local content_readers = {
-  ["cybersyn-provider-reader"] = {table_name = "cybersyn_provided"},
-  ["cybersyn-requester-reader"] = {table_name = "cybersyn_requested"},
-  ["cybersyn-delivery-reader"] = {table_name = "cybersyn_deliveries"},
-}
-
-local require_same_surface = settings.global["cybersyn_content_reader_same_surface"].value
-
--- get default network from LTN
-local default_network = settings.global["cybersyn-network-flag"].value
-script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-  if not event then return end
-  if event.setting == "cybersyn-network-flag" then
-    default_network = settings.global["cybersyn-network-flag"].value
-  end
-  if event.setting == "cybersyn_content_reader_update_interval" then
-    storage.update_interval = settings.global["cybersyn_content_reader_update_interval"].value
-  end
-  if event.setting == "cybersyn_content_reader_same_surface" then
-    require_same_surface = settings.global["cybersyn_content_reader_same_surface"].value
-  end
-end)
+local gui = require('gui')
+require('utils')
+require('variables')
 
 function append_item(t, station, item_hash, count, network_name, network_mask)
   if network_name == nil then
@@ -210,6 +188,14 @@ function Update_Combinator(combinator)
   end
 
   b.get_section(2).filters = signals
+
+  -- Update GUI for all players viewing this combinator
+  for _, player in pairs(game.players) do
+    local frame = storage.guis[player.index]
+    if frame and frame.context == combinator then
+      gui.update_signal_display(player, combinator)
+    end
+  end
 end
 
 -- add/remove event handlers
@@ -242,36 +228,35 @@ end
 
 ---- Initialisation  ----
 do
-local function init_globals()
-  storage.cybersyn_stops = storage.cybersyn_stops or {}
-  storage.cybersyn_provided = storage.cybersyn_provided or {}
-  storage.cybersyn_requested = storage.cybersyn_requested or {}
-  storage.cybersyn_deliveries = storage.cybersyn_deliveries or {}
-  storage.content_combinators = storage.content_combinators or {}
-  storage.update_interval = settings.global["cybersyn_content_reader_update_interval"].value
-end
-
-local function register_events()
-  -- register game events
-  script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, OnEntityCreated)
-  script.on_event({defines.events.on_pre_player_mined_item, defines.events.on_robot_pre_mined, defines.events.on_entity_died}, OnEntityRemoved)
-  if #storage.content_combinators > 0 then
-    script.on_event(defines.events.on_tick, OnTick)
+  local function init_globals()
+    storage.cybersyn_stops = storage.cybersyn_stops or {}
+    storage.cybersyn_provided = storage.cybersyn_provided or {}
+    storage.cybersyn_requested = storage.cybersyn_requested or {}
+    storage.cybersyn_deliveries = storage.cybersyn_deliveries or {}
+    storage.content_combinators = storage.content_combinators or {}
+    storage.update_interval = settings.global["cybersyn_content_reader_update_interval"].value
   end
-end
+
+  local function register_events()
+    -- register game events
+    script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, OnEntityCreated)
+    script.on_event({defines.events.on_pre_player_mined_item, defines.events.on_robot_pre_mined, defines.events.on_entity_died}, OnEntityRemoved)
+    if #storage.content_combinators > 0 then
+      script.on_event(defines.events.on_tick, OnTick)
+    end
+  end
 
 
-script.on_init(function()
-  init_globals()
-  register_events()
-end)
+  script.on_init(function()
+    init_globals()
+    gui.on_init()
+  end)
 
-script.on_configuration_changed(function(data)
-  init_globals()
-  register_events()
-end)
+  script.on_configuration_changed(function(data)
+    init_globals()
+  end)
 
-script.on_load(function(data)
-  register_events()
-end)
+  script.on_load(function(data)
+    register_events()
+  end)
 end

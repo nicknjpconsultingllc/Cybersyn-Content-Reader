@@ -11,6 +11,8 @@ provider_reader_entity.item_slot_count = 50 -- will be overwritten in final-fixe
 provider_reader_entity.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-provider-reader.png"
 provider_reader_entity.icon_size = 64
 provider_reader_entity.icon_mipmaps = 4
+provider_reader_entity.gui_mode = "all"
+provider_reader_entity.gui_style = "cybersyn_content_reader_gui"
 
 local provider_reader_item = flib.copy_prototype(data.raw["item"]["constant-combinator"], "cybersyn-provider-reader")
 provider_reader_item.icon = "__Cybersyn-Content-Reader__/graphics/icons/cybersyn-provider-reader.png"

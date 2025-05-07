@@ -5,3 +5,4 @@
 --]]
 
 require ("prototypes.combinator")
+require ("gui-styles")

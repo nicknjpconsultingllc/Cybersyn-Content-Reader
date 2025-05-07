@@ -4,7 +4,7 @@
   "title": "Cybersyn Network Content Reader",
   "author": "Danbopes",
   "contact": "https://forums.factorio.com/memberlist.php?mode=viewprofile&u=157577",
-  "homepage": "https://mods.factorio.com/mod/Cybersyn_Content_Reader",
+  "homepage": "https://mods.factorio.com/mod/Cybersyn-Content-Reader",
   "description": "Display Cybersyn's Provided and Requested content for specific Network ID's as combinator output.",
   "factorio_version": "2.0",
   "dependencies": ["base >= 2.0.0", "flib >= 0.15.0", "cybersyn >= 2.0.20"]
