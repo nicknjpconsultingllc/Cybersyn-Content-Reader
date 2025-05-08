@@ -1,8 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2025-05-07
+  Changes:
+    - Fixed a bug that caused the mod to not register events the first time it was loaded into the game
+
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2025-05-07
   Changes:
-    - Changed the mod thumbnail.
+    - Changed the mod thumbnail
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.0

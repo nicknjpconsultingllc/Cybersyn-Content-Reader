@@ -250,6 +250,7 @@ do
   script.on_init(function()
     init_globals()
     gui.on_init()
+    register_events()
   end)
 
   script.on_configuration_changed(function(data)
