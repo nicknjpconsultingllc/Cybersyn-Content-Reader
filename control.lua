@@ -368,6 +368,21 @@ do
     -- Register Cybersyn events
     local event_registered = RegisterCybersynEvents()
     
+    if #storage.content_combinators > 0 then
+      script.on_event(defines.events.on_tick, OnTick)
+    end
+    
+    return event_registered
+  end
+
+  local function register_events_with_fallback()
+    -- register game events
+    script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, OnEntityCreated)
+    script.on_event({defines.events.on_pre_player_mined_item, defines.events.on_robot_pre_mined, defines.events.on_entity_died}, OnEntityRemoved)
+    
+    -- Register Cybersyn events
+    local event_registered = RegisterCybersynEvents()
+    
     -- If no Cybersyn events are available, use a more frequent tick-based update
     if not event_registered then
       -- Reduce update interval for better responsiveness when Cybersyn events aren't available
@@ -379,11 +394,10 @@ do
     end
   end
 
-
   script.on_init(function()
     init_globals()
     gui.on_init()
-    register_events()
+    register_events_with_fallback()
     
     -- Try to register Cybersyn events after a delay in case Cybersyn loads after this mod
     script.on_nth_tick(60, function()
