@@ -52,6 +52,27 @@ function append_item(t, station, item_hash, count, network_name, network_mask)
   end
 end
 
+-- Check if Cybersyn data has changed
+function HasCybersynDataChanged(new_provided, new_requested, new_deliveries)
+  -- Simple comparison - if any of the tables have different content, consider it changed
+  local function table_equals(t1, t2)
+    if type(t1) ~= type(t2) then return false end
+    if type(t1) ~= "table" then return t1 == t2 end
+    
+    for k, v in pairs(t1) do
+      if not table_equals(v, t2[k]) then return false end
+    end
+    for k, v in pairs(t2) do
+      if not table_equals(v, t1[k]) then return false end
+    end
+    return true
+  end
+  
+  return not table_equals(new_provided, storage.cybersyn_provided) or
+         not table_equals(new_requested, storage.cybersyn_requested) or
+         not table_equals(new_deliveries, storage.cybersyn_deliveries)
+end
+
 function InitSignals()
   local stations = remote.call("cybersyn", "read_global", "stations")
 
@@ -102,9 +123,48 @@ function InitSignals()
 		end
 	end
 
-  storage.cybersyn_provided = inventory_provided
-  storage.cybersyn_requested = inventory_requested
-  storage.cybersyn_deliveries = inventory_in_transit
+  -- Only update if data has actually changed
+  if HasCybersynDataChanged(inventory_provided, inventory_requested, inventory_in_transit) then
+    storage.cybersyn_provided = inventory_provided
+    storage.cybersyn_requested = inventory_requested
+    storage.cybersyn_deliveries = inventory_in_transit
+    return true -- Indicate that data changed
+  end
+  
+  return false -- Indicate that data didn't change
+end
+
+-- Handle Cybersyn dispatcher updates
+function OnCybersynDispatcherUpdated(event)
+  -- Update the signals immediately when Cybersyn updates
+  local data_changed = InitSignals()
+  
+  -- Only update combinators if data actually changed
+  if data_changed then
+    for i = #storage.content_combinators, 1, -1 do
+      local combinator = storage.content_combinators[i]
+      if combinator.valid then
+        Update_Combinator(combinator)
+      else
+        table.remove(storage.content_combinators, i)
+      end
+    end
+  end
+end
+
+-- Force update all combinators immediately
+function ForceUpdateAllCombinators()
+  local data_changed = InitSignals()
+  if data_changed then
+    for i = #storage.content_combinators, 1, -1 do
+      local combinator = storage.content_combinators[i]
+      if combinator.valid then
+        Update_Combinator(combinator)
+      else
+        table.remove(storage.content_combinators, i)
+      end
+    end
+  end
 end
 
 -- spread out updating combinators
@@ -112,18 +172,24 @@ function OnTick(event)
   -- global.update_interval LTN update interval are synchronized in OnDispatcherUpdated
   local offset = event.tick % storage.update_interval
   local cc_count = #storage.content_combinators
+  local data_changed = false
+  
   if offset == 0 then
-    InitSignals()
+    data_changed = InitSignals()
   end
-  for i=cc_count - offset, 1, -1 * storage.update_interval do
-    -- log( "("..tostring(event.tick)..") on_tick updating "..i.."/"..cc_count )
-    local combinator = storage.content_combinators[i]
-    if combinator.valid then
-      Update_Combinator(combinator)
-    else
-      table.remove(storage.content_combinators, i)
-      if #storage.content_combinators == 0 then
-        script.on_event(defines.events.on_tick, nil)
+  
+  -- Only update combinators if data changed or if we're doing the regular tick update
+  if data_changed or offset == 0 then
+    for i=cc_count - offset, 1, -1 * storage.update_interval do
+      -- log( "("..tostring(event.tick)..") on_tick updating "..i.."/"..cc_count )
+      local combinator = storage.content_combinators[i]
+      if combinator.valid then
+        Update_Combinator(combinator)
+      else
+        table.remove(storage.content_combinators, i)
+        if #storage.content_combinators == 0 then
+          script.on_event(defines.events.on_tick, nil)
+        end
       end
     end
   end
@@ -198,12 +264,27 @@ function Update_Combinator(combinator)
   end
 end
 
+-- Handle Cybersyn station events
+function OnCybersynStationCreated(event)
+  -- When a new Cybersyn station is created, update all combinators
+  ForceUpdateAllCombinators()
+end
+
+function OnCybersynStationRemoved(event)
+  -- When a Cybersyn station is removed, update all combinators
+  ForceUpdateAllCombinators()
+end
+
 -- add/remove event handlers
 --- @param event EventData.on_built_entity
 function OnEntityCreated(event)
   local entity = event.entity
   if content_readers[entity.name] then
     table.insert(storage.content_combinators, entity)
+
+    -- Immediately update the new combinator
+    InitSignals() -- Always call InitSignals to ensure data is available
+    Update_Combinator(entity)
 
     if #storage.content_combinators == 1 then
       script.on_event(defines.events.on_tick, OnTick)
@@ -226,6 +307,48 @@ function OnEntityRemoved(event)
   end
 end
 
+-- Register Cybersyn events when the mod is loaded
+function RegisterCybersynEvents()
+  -- Try different possible event names that Cybersyn might use
+  local cybersyn_events = {
+    "cybersyn_dispatcher_updated",
+    "on_cybersyn_dispatcher_updated", 
+    "cybersyn-network-updated",
+    "on_cybersyn_network_updated"
+  }
+  
+  local event_registered = false
+  for _, event_name in pairs(cybersyn_events) do
+    local success, event_id = pcall(function() return remote.call("cybersyn", event_name) end)
+    if success and event_id then
+      script.on_event(event_id, OnCybersynDispatcherUpdated)
+      event_registered = true
+      break
+    end
+  end
+  
+  -- Try to register Cybersyn station events
+  local cybersyn_station_events = {
+    "cybersyn_station_created",
+    "on_cybersyn_station_created",
+    "cybersyn_station_removed", 
+    "on_cybersyn_station_removed"
+  }
+  
+  for _, event_name in pairs(cybersyn_station_events) do
+    local success, event_id = pcall(function() return remote.call("cybersyn", event_name) end)
+    if success and event_id then
+      if event_name:find("created") then
+        script.on_event(event_id, OnCybersynStationCreated)
+      elseif event_name:find("removed") then
+        script.on_event(event_id, OnCybersynStationRemoved)
+      end
+    end
+  end
+  
+  return event_registered
+end
+
 ---- Initialisation  ----
 do
   local function init_globals()
@@ -241,6 +364,16 @@ do
     -- register game events
     script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity}, OnEntityCreated)
     script.on_event({defines.events.on_pre_player_mined_item, defines.events.on_robot_pre_mined, defines.events.on_entity_died}, OnEntityRemoved)
+    
+    -- Register Cybersyn events
+    local event_registered = RegisterCybersynEvents()
+    
+    -- If no Cybersyn events are available, use a more frequent tick-based update
+    if not event_registered then
+      -- Reduce update interval for better responsiveness when Cybersyn events aren't available
+      storage.update_interval = math.min(storage.update_interval, 15)
+    end
+    
     if #storage.content_combinators > 0 then
       script.on_event(defines.events.on_tick, OnTick)
     end
@@ -251,6 +384,11 @@ do
     init_globals()
     gui.on_init()
     register_events()
+    
+    -- Try to register Cybersyn events after a delay in case Cybersyn loads after this mod
+    script.on_nth_tick(60, function()
+      RegisterCybersynEvents()
+    end)
   end)
 
   script.on_configuration_changed(function(data)
@@ -259,5 +397,16 @@ do
 
   script.on_load(function(data)
     register_events()
+  end)
+  
+  -- Add console command for debugging
+  commands.add_command("cybersyn-content-reader-update", "Force update all Cybersyn content reader combinators", function(command)
+    ForceUpdateAllCombinators()
+    if command.player_index then
+      local player = game.get_player(command.player_index)
+      if player then
+        player.print("Cybersyn content reader combinators updated.")
+      end
+    end
   end)
 end

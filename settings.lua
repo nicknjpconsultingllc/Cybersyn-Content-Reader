@@ -4,7 +4,7 @@ data:extend({
     name = "cybersyn_content_reader_update_interval",
     order = "aa",
     setting_type = "runtime-global",
-    default_value = 120,
+    default_value = 30,
     minimum_value = 1,
     maximum_value = 216000, -- 1h
   },
